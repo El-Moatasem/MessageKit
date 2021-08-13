@@ -31,6 +31,7 @@ open class AudioMessageCell: MessageContentCell {
     
     var seekingBallColor: UIColor?
     var seekingTrackColor: UIColor?
+    private var seekerPanGestureRecognizer : UIPanGestureRecognizer?
     
     /// The play button view to display on audio messages.
     public lazy var playButton: UIButton = {
@@ -43,18 +44,80 @@ open class AudioMessageCell: MessageContentCell {
     }()
     
     
+    private lazy var seekingView: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor.red
+        view.layer.cornerRadius = 12
+        view.clipsToBounds = true
+        return view
+    }()
+    
+    private lazy var progressContainerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor.blue
+        return view
+    }()
+    
+    func createDraggableSeekingView() {
+        seekerPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(panGestureAction(_:)))
+        seekerPanGestureRecognizer?.delegate = self
+        if let seekerPanGestureRecognizer = seekerPanGestureRecognizer {
+            seekingView.addGestureRecognizer(seekerPanGestureRecognizer)
+        }
+        seekingView.isUserInteractionEnabled = true
+        
+    }
+    
+    
+    @objc func panGestureAction(_ panGesture: UIPanGestureRecognizer) {
+        let location = panGesture.location(in: self.progressContainerView)
+        print("location.x: ", location.x)
+
+            
+            switch panGesture.state {
+            case .began:
+
+                break
+            case .changed:
+                
+//                if (location.x >= leadingOffset && location.x  <= (progressContainerView.frame.width - trailingOffset)) {
+//                    self.updateSeekingViewPositionInUI(offset: location.x)
+//                }
+//                self.handleViewPositionSeeking(offset: location.x)
+//
+                break
+            case .ended:
+                
+
+//                if (location.x >= leadingOffset && location.x <= progressContainerView.frame.width - trailingOffset) {
+//                    self.updateSeekingViewPositionInUI(offset: location.x)
+//                }
+                break
+            default:
+                break
+            }
+        }
+    
+    
+    
     private lazy var audioSeekingProgressBar: UISlider = {
         let slider = UISlider()
-        let circleImage = makeCircleWith(size: CGSize(width: 15, height: 15),
-                                         backgroundColor: UIColor.black)
-        slider.setThumbImage(circleImage, for: .normal)
+//        let circleImage = makeCircleWith(size: CGSize(width: 15, height: 15),
+//                                         backgroundColor: UIColor.black)
+//        slider.setThumbImage(circleImage, for: .normal)
         slider.minimumTrackTintColor = UIColor.blue
         slider.maximumTrackTintColor = UIColor.green
+        
+        slider.minimumValue = 0
+        slider.maximumValue = 100
+        slider.isContinuous = true
+        
         slider.addTarget(self, action: #selector(self.sliderValueDidChange(_:)), for: .valueChanged)
         return slider
     }()
     
     @objc func sliderValueDidChange(_ sender:UISlider) {
+        
     }
     
 
@@ -90,12 +153,37 @@ open class AudioMessageCell: MessageContentCell {
         durationLabel.addConstraints(right: messageContainerView.rightAnchor, centerY: messageContainerView.centerYAnchor, rightConstant: 15)
         progressView.addConstraints(left: playButton.rightAnchor, right: durationLabel.leftAnchor, centerY: messageContainerView.centerYAnchor, leftConstant: 5, rightConstant: 5)
         
+// UISlider:
+//        audioSeekingProgressBar.centerYAnchor.constraint(equalTo: self.progressView.centerYAnchor).isActive = true
+//        audioSeekingProgressBar.trailingAnchor.constraint(equalTo: self.progressView.trailingAnchor, constant: 0).isActive = true
+//        audioSeekingProgressBar.leadingAnchor.constraint(equalTo: self.progressView.leadingAnchor, constant: 0).isActive = true
+//        audioSeekingProgressBar.heightAnchor.constraint(equalToConstant: 30).isActive = true
+//        audioSeekingProgressBar.translatesAutoresizingMaskIntoConstraints = false
+//        audioSeekingProgressBar.layoutIfNeeded()
         
-        audioSeekingProgressBar.centerYAnchor.constraint(equalTo: self.progressView.centerYAnchor).isActive = true
-        audioSeekingProgressBar.trailingAnchor.constraint(equalTo: self.progressView.trailingAnchor, constant: 0).isActive = true
-        audioSeekingProgressBar.leadingAnchor.constraint(equalTo: self.progressView.leadingAnchor, constant: 0).isActive = true
-        audioSeekingProgressBar.translatesAutoresizingMaskIntoConstraints = false
+       
         
+// Seeking View with Gesture :
+        
+//        progressContainerView.centerYAnchor.constraint(equalTo: self.progressView.centerYAnchor).isActive = true
+//        progressContainerView.trailingAnchor.constraint(equalTo: self.progressView.trailingAnchor, constant: 0).isActive = true
+//        progressContainerView.leadingAnchor.constraint(equalTo: self.progressView.leadingAnchor, constant: 0).isActive = true
+//        progressContainerView.heightAnchor.constraint(equalToConstant: 30).isActive = true
+//        progressContainerView.translatesAutoresizingMaskIntoConstraints = false
+//        progressContainerView.layoutIfNeeded()
+//
+//
+//
+//        seekingView.centerYAnchor.constraint(equalTo: self.progressContainerView.centerYAnchor).isActive = true
+//        seekingView.leadingAnchor.constraint(equalTo: self.progressContainerView.leadingAnchor, constant: 0).isActive = true
+//
+//        seekingView.heightAnchor.constraint(equalToConstant: 24).isActive = true
+//        seekingView.widthAnchor.constraint(equalToConstant: 24).isActive = true
+//        seekingView.translatesAutoresizingMaskIntoConstraints = false
+//
+//        createDraggableSeekingView()
+        
+
     }
 
     open override func setupSubviews() {
@@ -104,8 +192,16 @@ open class AudioMessageCell: MessageContentCell {
         messageContainerView.addSubview(activityIndicatorView)
         messageContainerView.addSubview(durationLabel)
         messageContainerView.addSubview(progressView)
-        messageContainerView.addSubview(audioSeekingProgressBar)
-        messageContainerView.bringSubviewToFront(audioSeekingProgressBar)
+        
+// UISlider:
+//        messageContainerView.addSubview(audioSeekingProgressBar)
+//        messageContainerView.bringSubviewToFront(audioSeekingProgressBar)
+        
+// Seeking View with Gesture :
+//        messageContainerView.addSubview(progressContainerView)
+//        progressContainerView.addSubview(seekingView)
+//        progressContainerView.bringSubviewToFront(seekingView)
+        
         setupConstraints()
     }
 
@@ -116,7 +212,10 @@ open class AudioMessageCell: MessageContentCell {
         activityIndicatorView.stopAnimating()
         playButton.isHidden = false
         durationLabel.text = "0:00"
-        audioSeekingProgressBar.value = 0
+//        audioSeekingProgressBar.value = 0
+        audioSeekingProgressBar.maximumValue = 0
+        audioSeekingProgressBar.minimumValue = 100.0
+        audioSeekingProgressBar.value = 50.0
     }
 
     /// Handle tap gesture on contentView and its subviews.
@@ -124,15 +223,32 @@ open class AudioMessageCell: MessageContentCell {
         let touchLocation = gesture.location(in: self)
         // compute play button touch area, currently play button size is (25, 25) which is hardly touchable
         // add 10 px around current button frame and test the touch against this new frame
+        let uiSliderTouchArea = CGRect(audioSeekingProgressBar.frame.origin.x - 10.0, audioSeekingProgressBar.frame.origin.y - 10, audioSeekingProgressBar.frame.size.width + 20, audioSeekingProgressBar.frame.size.height + 20)
+        
+        
+        let progressContainerTouchArea = CGRect(progressContainerView.frame.origin.x - 10.0, progressContainerView.frame.origin.y - 10, progressContainerView.frame.size.width + 20, progressContainerView.frame.size.height + 20)
+        
+        
+        
         let playButtonTouchArea = CGRect(playButton.frame.origin.x - 10.0, playButton.frame.origin.y - 10, playButton.frame.size.width + 20, playButton.frame.size.height + 20)
         let translateTouchLocation = convert(touchLocation, to: messageContainerView)
         if playButtonTouchArea.contains(translateTouchLocation) {
             delegate?.didTapPlayButton(in: self)
+        }
+        if progressContainerTouchArea.contains(translateTouchLocation) {
+//            delegate?.didTapPlayButton(in: self)
+        }
+        if uiSliderTouchArea.contains(translateTouchLocation) {
+            //            delegate?.didTapPlayButton(in: self)
         } else {
             super.handleTapGesture(gesture)
         }
     }
 
+    
+   
+    
+    
     // MARK: - Configure Cell
 
     open override func configure(with message: MessageType, at indexPath: IndexPath, and messagesCollectionView: MessagesCollectionView) {
@@ -183,5 +299,13 @@ extension AudioMessageCell {
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return image
+    }
+}
+
+
+
+extension AudioMessageCell: UIGestureRecognizerDelegate {
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
     }
 }

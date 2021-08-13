@@ -28,6 +28,10 @@ import AVFoundation
 /// A subclass of `MessageContentCell` used to display video and audio messages.
 open class AudioMessageCell: MessageContentCell {
 
+    
+    var seekingBallColor: UIColor?
+    var seekingTrackColor: UIColor?
+    
     /// The play button view to display on audio messages.
     public lazy var playButton: UIButton = {
         let playButton = UIButton(type: .custom)
@@ -37,6 +41,19 @@ open class AudioMessageCell: MessageContentCell {
         playButton.setImage(pauseImage?.withRenderingMode(.alwaysTemplate), for: .selected)
         return playButton
     }()
+    
+    
+    private lazy var audioSeekingProgressBar: UISlider = {
+        let slider = UISlider()
+        let circleImage = makeCircleWith(size: CGSize(width: 15, height: 15),
+                                         backgroundColor: UIColor.black)
+        slider.setThumbImage(circleImage, for: .normal)
+        slider.minimumTrackTintColor = UIColor.blue
+        slider.maximumTrackTintColor = UIColor.green
+        slider.addTarget(self, action: #selector(self.sliderValueDidChange(_:)), for: .valueChanged)
+        return slider
+    }()
+    
 
     /// The time duration lable to display on audio messages.
     public lazy var durationLabel: UILabel = {
@@ -69,6 +86,13 @@ open class AudioMessageCell: MessageContentCell {
         activityIndicatorView.addConstraints(centerY: playButton.centerYAnchor, centerX: playButton.centerXAnchor)
         durationLabel.addConstraints(right: messageContainerView.rightAnchor, centerY: messageContainerView.centerYAnchor, rightConstant: 15)
         progressView.addConstraints(left: playButton.rightAnchor, right: durationLabel.leftAnchor, centerY: messageContainerView.centerYAnchor, leftConstant: 5, rightConstant: 5)
+        
+        
+        audioSeekingProgressBar.centerYAnchor.constraint(equalTo: self.progressView.centerYAnchor).isActive = true
+        audioSeekingProgressBar.trailingAnchor.constraint(equalTo: self.progressView.trailingAnchor, constant: 0).isActive = true
+        audioSeekingProgressBar.leadingAnchor.constraint(equalTo: self.progressView.leadingAnchor, constant: 0).isActive = true
+        audioSeekingProgressBar.translatesAutoresizingMaskIntoConstraints = false
+        
     }
 
     open override func setupSubviews() {
@@ -77,6 +101,8 @@ open class AudioMessageCell: MessageContentCell {
         messageContainerView.addSubview(activityIndicatorView)
         messageContainerView.addSubview(durationLabel)
         messageContainerView.addSubview(progressView)
+        messageContainerView.addSubview(audioSeekingProgressBar)
+        messageContainerView.bringSubviewToFront(audioSeekingProgressBar)
         setupConstraints()
     }
 
@@ -87,6 +113,7 @@ open class AudioMessageCell: MessageContentCell {
         activityIndicatorView.stopAnimating()
         playButton.isHidden = false
         durationLabel.text = "0:00"
+        audioSeekingProgressBar.value = 0
     }
 
     /// Handle tap gesture on contentView and its subviews.

@@ -54,6 +54,9 @@ open class AudioMessageCell: MessageContentCell {
         return slider
     }()
     
+    @objc func sliderValueDidChange(_ sender:UISlider) {
+    }
+    
 
     /// The time duration lable to display on audio messages.
     public lazy var durationLabel: UILabel = {

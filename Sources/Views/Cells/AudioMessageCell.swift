@@ -57,54 +57,16 @@ open class AudioMessageCell: MessageContentCell {
         view.backgroundColor = UIColor.blue
         return view
     }()
-    
-    func createDraggableSeekingView() {
-        seekerPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(panGestureAction(_:)))
-        seekerPanGestureRecognizer?.delegate = self
-        if let seekerPanGestureRecognizer = seekerPanGestureRecognizer {
-            seekingView.addGestureRecognizer(seekerPanGestureRecognizer)
-        }
-        seekingView.isUserInteractionEnabled = true
-        
-    }
-    
-    
-    @objc func panGestureAction(_ panGesture: UIPanGestureRecognizer) {
-        let location = panGesture.location(in: self.progressContainerView)
-        print("location.x: ", location.x)
 
-            
-            switch panGesture.state {
-            case .began:
-
-                break
-            case .changed:
-                
-//                if (location.x >= leadingOffset && location.x  <= (progressContainerView.frame.width - trailingOffset)) {
-//                    self.updateSeekingViewPositionInUI(offset: location.x)
-//                }
-//                self.handleViewPositionSeeking(offset: location.x)
-//
-                break
-            case .ended:
-                
-
-//                if (location.x >= leadingOffset && location.x <= progressContainerView.frame.width - trailingOffset) {
-//                    self.updateSeekingViewPositionInUI(offset: location.x)
-//                }
-                break
-            default:
-                break
-            }
-        }
     
+
     
     
     private lazy var audioSeekingProgressBar: UISlider = {
         let slider = UISlider()
-//        let circleImage = makeCircleWith(size: CGSize(width: 15, height: 15),
-//                                         backgroundColor: UIColor.black)
-//        slider.setThumbImage(circleImage, for: .normal)
+        let circleImage = makeCircleWith(size: CGSize(width: 15, height: 15),
+                                         backgroundColor: UIColor.black)
+        slider.setThumbImage(circleImage, for: .normal)
         slider.minimumTrackTintColor = UIColor.blue
         slider.maximumTrackTintColor = UIColor.green
         
@@ -154,14 +116,19 @@ open class AudioMessageCell: MessageContentCell {
         progressView.addConstraints(left: playButton.rightAnchor, right: durationLabel.leftAnchor, centerY: messageContainerView.centerYAnchor, leftConstant: 5, rightConstant: 5)
         
 // UISlider:
-//        audioSeekingProgressBar.centerYAnchor.constraint(equalTo: self.progressView.centerYAnchor).isActive = true
-//        audioSeekingProgressBar.trailingAnchor.constraint(equalTo: self.progressView.trailingAnchor, constant: 0).isActive = true
-//        audioSeekingProgressBar.leadingAnchor.constraint(equalTo: self.progressView.leadingAnchor, constant: 0).isActive = true
-//        audioSeekingProgressBar.heightAnchor.constraint(equalToConstant: 30).isActive = true
-//        audioSeekingProgressBar.translatesAutoresizingMaskIntoConstraints = false
-//        audioSeekingProgressBar.layoutIfNeeded()
+        audioSeekingProgressBar.centerYAnchor.constraint(equalTo: self.messageContainerView.centerYAnchor).isActive = true
+        audioSeekingProgressBar.trailingAnchor.constraint(equalTo: durationLabel.leadingAnchor, constant: 0).isActive = true
+        audioSeekingProgressBar.leadingAnchor.constraint(equalTo: playButton.leadingAnchor, constant: 30 ).isActive = true
+        audioSeekingProgressBar.heightAnchor.constraint(equalToConstant: 20).isActive = true
+        audioSeekingProgressBar.translatesAutoresizingMaskIntoConstraints = false
+        audioSeekingProgressBar.layoutIfNeeded()
         
-       
+        
+//    testSwitch.centerYAnchor.constraint(equalTo: self.messageContainerView.centerYAnchor).isActive = true
+//    testSwitch.leadingAnchor.constraint(equalTo: self.messageContainerView.leadingAnchor, constant: 0).isActive = true
+//    testSwitch.heightAnchor.constraint(equalToConstant: 35).isActive = true
+//    testSwitch.widthAnchor.constraint(equalToConstant: 300).isActive = true
+//    testSwitch.translatesAutoresizingMaskIntoConstraints = false
         
 // Seeking View with Gesture :
         
@@ -193,9 +160,17 @@ open class AudioMessageCell: MessageContentCell {
         messageContainerView.addSubview(durationLabel)
         messageContainerView.addSubview(progressView)
         
+        
+
 // UISlider:
-//        messageContainerView.addSubview(audioSeekingProgressBar)
-//        messageContainerView.bringSubviewToFront(audioSeekingProgressBar)
+        self.addSubview(audioSeekingProgressBar)
+        self.bringSubviewToFront(audioSeekingProgressBar)
+        
+        
+// UISwitch:
+//        messageContainerView.addSubview(testSwitch)
+//        messageContainerView.bringSubviewToFront(testSwitch)
+                
         
 // Seeking View with Gesture :
 //        messageContainerView.addSubview(progressContainerView)
@@ -213,9 +188,9 @@ open class AudioMessageCell: MessageContentCell {
         playButton.isHidden = false
         durationLabel.text = "0:00"
 //        audioSeekingProgressBar.value = 0
-        audioSeekingProgressBar.maximumValue = 0
-        audioSeekingProgressBar.minimumValue = 100.0
-        audioSeekingProgressBar.value = 50.0
+//        audioSeekingProgressBar.maximumValue = 0
+//        audioSeekingProgressBar.minimumValue = 100.0
+//        audioSeekingProgressBar.value = 50.0
     }
 
     /// Handle tap gesture on contentView and its subviews.
